@@ -48,3 +48,4 @@ export * from './modules/rankings/ranking.repository';
 export * from './modules/rankings/ranking.service';
 export * from './modules/engagement/engagement.repository';
 export * from './modules/engagement/engagement.service';
+export * from './modules/payments/payment.service';

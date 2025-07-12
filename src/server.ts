@@ -13,6 +13,7 @@ import orderRoutes from './modules/marketplace/order.routes';
 import messageRoutes from './modules/messages/message.routes';
 import rankingRoutes from './modules/rankings/ranking.routes';
 import engagementRoutes from './modules/engagement/engagement.routes';
+import paymentRoutes from './modules/payments/payment.routes';
 
 // Create Express app
 const app = express();
@@ -42,6 +43,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/rankings', rankingRoutes);
 app.use('/api/engagement', engagementRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
