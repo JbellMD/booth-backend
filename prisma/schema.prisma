@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ContentType {
+  text
+  image
+  video
+}
+
+enum MembershipRank {
+  Bronze
+  Gold
+  Diamond
+}
+
+enum OrderStatus {
+  pending
+  completed
+  refunded
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  users       User[]
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String?
+  displayName   String
+  bio           String?
+  avatarUrl     String?
+  coverUrl      String?
+  location      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  roleId        String
+  role          Role     @relation(fields: [roleId], references: [id])
+
+  posts         Post[]
+  metrics       ProfileMetrics?
+  badges        UserBadge[]
+  products      MarketplaceProduct[]
+  orders        Order[]  @relation("BuyerOrders")
+  messagesSent  Message[] @relation("SentMessages")
+}
+
+model ProfileMetrics {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id])
+  hustleScore      Float
+  buzzScore        Float
+  cloutScore       Float
+  connectionScore  Float
+  membershipRank   MembershipRank
+  updatedAt        DateTime @updatedAt
+}
+
+model Post {
+  id           String      @id @default(uuid())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id])
+  contentType  ContentType
+  textBody     String?
+  mediaUrl     String?
+  thumbnailUrl String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model UserBadge {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  name      String
+  imageUrl  String
+  earnedAt  DateTime @default(now())
+}
+
+model MarketplaceProduct {
+  id          String   @id @default(uuid())
+  sellerId    String
+  seller      User     @relation(fields: [sellerId], references: [id])
+  title       String
+  description String
+  mediaUrl    String?
+  priceCents  Int
+  currency    String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orders      Order[]
+}
+
+model Order {
+  id          String     @id @default(uuid())
+  buyerId     String
+  buyer       User       @relation("BuyerOrders", fields: [buyerId], references: [id])
+  productId   String
+  product     MarketplaceProduct @relation(fields: [productId], references: [id])
+  amountCents Int
+  currency    String
+  status      OrderStatus
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Message {
+  id              String   @id @default(uuid())
+  senderId        String
+  conversationId  String
+  textBody        String?
+  mediaUrl        String?
+  createdAt       DateTime @default(now())
+
+  sender          User     @relation("SentMessages", fields: [senderId], references: [id])
+}
